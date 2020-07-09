@@ -205,7 +205,7 @@ function Stage(){
 function Chr(){
  	Spr.apply(this);
   this.sp=4;
-  this.name="‚ä‚È";
+  this.name="yuna";
   this.type="Chr";
   this.hp=100;
   this.en=100;
