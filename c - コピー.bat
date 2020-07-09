@@ -1,0 +1,2 @@
+heroku restart
+pause
