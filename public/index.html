@@ -15,6 +15,35 @@
 
     <script src="three.min.js"></script>
     <script>
+    
+////////SE
+
+var ctx=new AudioContext();
+var vco0=ctx.createOscillator();   
+var gain = ctx.createGain();
+gain.gain.value=50/100;
+vco0.type="sawtooth";
+vco0.frequency.value=440;
+vco0.connect(gain);
+gain.connect(ctx.destination);
+
+function oto(a){
+	var b=27.500*Math.pow(2,(a-1)/12);
+	console.log(a+":"+b);
+	var tp = ctx.currentTime;
+	var t0 = ctx.currentTime+0.01;
+
+	var max=0.05;
+	
+	amp.gain.cancelScheduledValues(tp);
+	amp.gain.linearRampToValueAtTime(0,t0);//  ...
+	amp.gain.linearRampToValueAtTime(max,t0+attack);//  ///
+	amp.gain.linearRampToValueAtTime(sustain,t0+attack+decay);//  ///
+	amp.gain.linearRampToValueAtTime(sustain,t0+attack+decay+aa);//  ///
+	amp.gain.linearRampToValueAtTime(0,t0+attack+decay+aa+release);//  ///
+	return b;
+}
+///////
 var dat=[];
 var way=[];
 var ky=[];
@@ -34,6 +63,7 @@ document.onkeydown=function(e){
 	if(!ky[ky3])ky[ky3]=1;
 	if(ky[ky3]==0)ky[ky3]=1;
 	//log(ky3);
+	//vco0.start();
 }
 document.onkeyup=function(e){
 	ky3=e.keyCode;
@@ -52,6 +82,7 @@ function abs(a){
 let own=new THREE.Object3D();
 let chr=[];
 var container = new THREE.Object3D();
+var container2d = new THREE.Object3D();
 let t=0;
 let camera=new THREE.Object3D();
 
@@ -121,14 +152,30 @@ function drawS(a,b,c,d){
 		}
  	}
 }
-const texw=512;
+function drawS2(a,b,c,e,d){
+    canc.clearRect(a,b,c,d.length/c);
+	for(var i=0;i<d.length;i++){//if(d[i]!=11){
+		if(d[i]=="・"){
+		
+		}else{
+			if(d[i]=="　")canc.fillStyle="hsl("+e+",20%,100%)";
+			if(d[i]=="□")canc.fillStyle="hsl("+e+",20%,80%)";
+			if(d[i]=="❒")canc.fillStyle="hsl("+e+",20%,50%)";
+			if(d[i]=="◆")canc.fillStyle="hsl("+e+",20%,55%)";
+			if(d[i]=="■")canc.fillStyle="hsl("+e+",20%,25%)";
+			canc.fillRect(i%c+a,parseInt(i/c)+b,1,1);
+		}
+ 	}
+}
+const texw=64;
  //const can = document.createElement('canvas');
  const can =  document.getElementById('can1');
- can.width=512;
- can.height=512;
+ can.width=texw;
+ can.height=texw;
  const canc = can1.getContext('2d');
  canc.imageSmoothingEnabled = false;
  canc.scale(1,1);
+ /*
  var k=4;
  for(var j=0;j<100/k;j++)
  for(var i=0;i<360/k;i++){
@@ -142,11 +189,16 @@ const texw=512;
  for(var i=1;i<10;i++){
 	draw(200+i*scale,j*scale,scale,new Array(scale*scale).fill(i*10+j));//8階調パレット
  }
+ */
  const textureF=new THREE.Texture(can);
  textureF.magFilter = THREE.NearestFilter;
  textureF.minFilter = THREE.LinearMipMapLinearFilter;
 
- canc.fillText("abcdefg",0,100,texw);
+ canc.fillStyle = "blue";
+ canc.font ="7px 'ＭＳ ゴシック'";
+ canc.textAlign = "left";
+ canc.textBaseline = "top";
+ canc.fillText("ミニオン",16,48,texw);
 
 
 drawS(0,0,16,"\
@@ -215,6 +267,24 @@ drawS(0,0,16,"\
 ・・・・・・■・■・・・・・・・\
 ・・・・・・■・・・・・・・・・\
 ");
+drawS2(0,48,16,50,"\
+・・・・□□□❒❒❒・・・・・・\
+・・・□□❒❒❒❒■■■・・・・\
+・・・□■❒❒❒■■■■・・・・\
+・・□■■❒■■　■■■■・・・\
+・・■■■□■■　□■■■・・・\
+・・❒■　■　■　■　■❒・・・\
+・・❒■　■　　　■　■❒・・・\
+・・■■■　　　　　■■■・・・\
+・・・■・■■■■■・■・・・・\
+・・・・・■■■■■・・・・・・\
+・・・・■＃＃❒＃＃■・・・・・\
+・・・■■＃＃■＃＃■■・・・・\
+・・・■＃＃＃＃＃＃＃■・・・・\
+・・・・■■■■■■■・・・・・\
+・・・・・・■・■・・・・・・・\
+・・・・・・■・・・・・・・・・\
+");
 drawS(16,0,16,"\
 ・・・■・・・・・・・■・・・・\
 ・・・■・・・・・・・■・・・・\
@@ -249,7 +319,7 @@ drawS(16,0,16,"\
 　　　　　　　　　　　　　　　　\
 　　　　　　　　　　　　　　　　\
 ");
-drawS(32,0,16,"\
+drawS2(32,0,16,200,"\
 ■■■■■■■■■■■■■■■■\
 ■■■　　　　　　　　　　■■■\
 ■■■　　　　　　　　　　■■■\
@@ -283,6 +353,42 @@ drawS(32,0,16,"\
 ■　　　　　　　　　　　　　　　\
 ■　　　　　　　　　　　　　　　\
 ");
+drawS(48,0,8,"\
+　　　　■　　　\
+　　　■■　　　\
+　　　　■　　　\
+　　　　■　　　\
+　　　　■　　　\
+　　　　■　　　\
+　　　■■■　　\
+　　　　　　　　\
+　　　■■　　　\
+　　■　　■　　\
+　　■　　■　　\
+　　　　　■　　\
+　　　　■　　　\
+　　　■　　　　\
+　　■　　　　　\
+　　■■■■　　\
+");
+drawS(48,0,8,"\
+　■■■■■■　\
+■　　　　　　■\
+■　　　　　　■\
+　　　　　　　　\
+　　■■■■　　\
+　■■　　■■　\
+　■■■■■■　\
+　　　■■　　　\
+　　　■■　　　\
+　　■　　■　　\
+　　■　　■　　\
+　　　　　■　　\
+　　　　■　　　\
+　　　■　　　　\
+　　■　　　　　\
+　　■■■■　　\
+");
                                                     
                                                     
                                                                         
@@ -290,7 +396,69 @@ drawS(32,0,16,"\
                                                                         
                                                                         
                                                                         
-            
+
+class Mes extends THREE.Mesh {
+
+
+  constructor() {
+    const geo1 = new THREE.PlaneGeometry(1,1);
+    
+    geo1.faceVertexUvs[0][0]=vec(0,0,16,16,0);
+    geo1.faceVertexUvs[0][1]=vec(0,0,16,16,1);
+
+    //const texture=new THREE.TextureLoader().load(can);
+    var textureV=new THREE.Texture(can);
+    textureV.magFilter = THREE.NearestFilter;
+    textureV.minFilter = THREE.LinearMipMapLinearFilter;
+
+    const material = new THREE.MeshPhongMaterial({
+//    let material = new THREE.MeshStandardMaterial({
+    //const material = new THREE.MeshToonMaterial({
+      color:0xffffff,
+  //    color:0x111111,
+//      color:0x000000,
+      side: THREE.DoubleSide,
+      transparent: true,
+      map: textureV,
+     // depthTest:false,
+   //     blending:THREE.NormalBlending,
+      //blending: THREE.AdditiveBlending, // ブレンドモード
+      //blending: THREE.MultiplyBlending, // ブレンドモード
+      //depthWrite: false       // デプスバッファへの書き込み可否
+        //depthTest:false
+    });
+      material.flatShading = true;
+    //material.fog = true;
+
+    super(geo1, material);
+    this.material.map.needsUpdate = true;
+   
+    this.tg=0;
+    this.receiveShadow = true;
+    container.add(this);
+   // this.renderOrder = 1;
+    this.position.y=0;
+    this.human=0;
+    this.position.y=0.5;
+
+    this.position.x=1;
+    this.position.z=1;
+    
+    
+    this.position.y=0.5;
+
+
+  }
+  update(){
+		//テクスチャ処理
+		
+		this.material.map.offset=new THREE.Vector2(16/texw,-48/texw);
+	  //this.rotation.setFromRotationMatrix(camera.matrix);
+    	this.quaternion.copy(camera.quaternion);
+	    this.position.x=camera.position.x;
+	    this.position.z=camera.position.z-5;
+  }
+}   
 class Chr extends THREE.Mesh {//11  alpha 
 /*2 ->0  0  
 3->1  45
@@ -340,6 +508,8 @@ class Chr extends THREE.Mesh {//11  alpha
    
     this.type=0;
     this.hate=0;
+    this.hatetg=0;
+    this.tg=0;
     this.tgx=0;
     this.tgy=0;
     this.ky=[];
@@ -365,23 +535,44 @@ class Chr extends THREE.Mesh {//11  alpha
     //  c.owner=this;
      // this.child=c;
 
+    var m=new Mes();
+  
     this.position.x=1;
     this.position.z=1;
 
   }
   update(){
-      if(own==this){
+      if(own==this){//キー処理
           this.ky[gk("A")]=ky[gk("A")];
           this.ky[gk("W")]=ky[gk("W")];
           this.ky[gk("D")]=ky[gk("D")];
           this.ky[gk("S")]=ky[gk("S")];
-      }else if(this.type==0){
-        this.hate--;
-        if(this.hate<=0){
-          this.tgx=rnd(mapx);
-          this.tgy=rnd(mapy);
-          this.hate=60*3+rnd(60*11);
-        }
+          document.title=own.position.x+" "+own.position.z;
+      }else{//タゲ処理
+      	if(this.type==0){
+	        this.hate--;
+	        if(this.hate<=0){
+	          this.tgx=rnd(mapx);
+	          this.tgy=rnd(mapy);
+	          this.hate=rnd(10);
+	        }
+	    }else if(this.type==1){
+	        this.hatetg--;
+	        this.hate--;
+	        if(this.hatetg<=0){
+	          this.tg=chr[rnd(chr.length)];
+	          //this.tg=own;
+	          this.hatetg=rnd(200);
+	        }
+	        if(this.hate<=0){
+		        if(this.tg!=0){
+		            this.tgx=flr(this.tg.position.x);
+		            this.tgy=flr(this.tg.position.z);
+		        }
+		    	this.hate=rnd(30);
+	        }
+	    }
+        //キー処理
         if(this.position.x+this.position.z-flr(this.position.x+this.position.z)==0){
            var d0=-5;
            var d1=-5;
@@ -406,41 +597,8 @@ class Chr extends THREE.Mesh {//11  alpha
            if(r==2)this.ky[gk("D")]=1;
            if(r==3)this.ky[gk("S")]=1;
         }
-
-      }else if(this.type==1){
-        this.hate--;
-        if(this.hate<=0){
-          var r=rnd(chr.length);
-          this.tgx=flr(chr[r].position.x);
-          this.tgy=flr(chr[r].position.z);
-          this.hate=60*3+rnd(60*11);
-        }
-        if(this.position.x+this.position.z-flr(this.position.x+this.position.z)==0){
-           var d0=-5;
-           var d1=-5;
-           var d2=-5;
-           var d3=-5;
-           var r=-1;
-           var dd=way[this.tgy][this.tgx][this.position.z][this.position.x];
-           if(this.position.x!=0)d0=way[this.tgy][this.tgx][this.position.z][this.position.x-1];
-           if(this.position.z!=0)d1=way[this.tgy][this.tgx][this.position.z-1][this.position.x];
-           if(this.position.x!=mapx-1)d2=way[this.tgy][this.tgx][this.position.z][this.position.x+1];
-           if(this.position.z!=mapy-1)d3=way[this.tgy][this.tgx][this.position.z+1][this.position.x];
-           if(d0>=0)if(dd>d0){r=0;dd=d0;}
-           if(d1>=0)if(dd>d1){r=1;dd=d1;}
-           if(d2>=0)if(dd>d2){r=2;dd=d2;}
-           if(d3>=0)if(dd>d3){r=3;dd=d3;}
-           this.ky[gk("A")]=0;
-           this.ky[gk("W")]=0;
-           this.ky[gk("D")]=0;
-           this.ky[gk("S")]=0;
-           if(r==0)this.ky[gk("A")]=1;
-           if(r==1)this.ky[gk("W")]=1;
-           if(r==2)this.ky[gk("D")]=1;
-           if(r==3)this.ky[gk("S")]=1;
-        }
-
       }
+      //移動先壁判定処理
       var sp=tile/16;
       if(this.position.x+this.position.z-flr(this.position.x+this.position.z)==0){
           var d0=5;
@@ -458,26 +616,21 @@ class Chr extends THREE.Mesh {//11  alpha
           else if(this.ky[gk("D")]){if(d2==0)this.position.x+=sp;this.dr=2;}
           else if(this.ky[gk("S")]){if(d3==0)this.position.z+=sp;this.dr=3;}
       }else{
+      	//移動処理
           if(this.dr==0)this.position.x-=sp;
           if(this.dr==1)this.position.z-=sp;
           if(this.dr==2)this.position.x+=sp;
           if(this.dr==3)this.position.z+=sp;
       }
-      if(own==this){
+      if(own==this){//カメラ処理
           camera.look.x=this.position.x;
           camera.look.z=this.position.z;
       }
 
-//      this.material.map.offset=
-  //    new THREE.Vector2([0,1,0,2][abs(flr((this.position.x+this.position.z)/tile))%4]*0/texw,-this.type*0/texw);
-  
-  		if(own==this)this.material.map.offset=new THREE.Vector2(0/texw,0/texw);
-      	else this.material.map.offset=new THREE.Vector2(16/texw,0/texw);
-      
-      
-    //  if(this==own)this.point.position.set(this.position.x,this.position.y+2,this.position.z+1);
-  //this.rotation.setFromRotationMatrix(camera.matrix);
-    //this.quaternion.copy(camera.quaternion);
+		//テクスチャ処理
+		if(own==this)this.material.map.offset=new THREE.Vector2(0/texw,0/texw);
+		else if(this.type==0)this.material.map.offset=new THREE.Vector2(0/texw,0/texw);
+		else if(this.type==1)this.material.map.offset=new THREE.Vector2(0/texw,-48/texw);
   }
 }
 
@@ -589,9 +742,30 @@ class Stage extends THREE.Mesh {
       }
       for(var j=0;j<mapy;j++) {
         for(var i=0;i<mapx;i++){
-              ret(j,i,j,i,j,i);
+          for(var l=0;l<1000;l++){
+	          var k=0;
+	          for(var b=0;b<mapy;b++) {
+	            for(var a=0;a<mapx;a++) {
+	          		if(way[j][i][b][a]!=-5)continue;
+	          		if(a>=1)if(way[j][i][b][a-1]>=0)way[j][i][b][a]=way[j][i][b][a-1]+1;
+	          		if(b>=1)if(way[j][i][b-1][a]>=0)way[j][i][b][a]=way[j][i][b-1][a]+1;
+	          		if(a<mapx-1)if(way[j][i][b][a+1]>=0)way[j][i][b][a]=way[j][i][b][a+1]+1;
+	          		if(b<mapy-1)if(way[j][i][b+1][a]>=0)way[j][i][b][a]=way[j][i][b+1][a]+1;
+	          		if(a==i&&b==j)way[j][i][b][a]=0;
+	          		if(dat[j][i]==1)way[j][i][b][a]=-1;
+	          		if(dat[b][a]==1)way[j][i][b][a]=-1;
+	          		if(way[j][i][b][a]==-5)k++;
+		        }
+	          }
+	          if(k==0)break;
+	       }
         }
       }
+      /*for(var j=0;j<mapy;j++) {
+        for(var i=0;i<mapx;i++){
+              ret(j,i,j,i,j,i);
+        }
+      }*/
       if(way[1][1][mapy-2][mapx-2]>=0)break;
     }
 
@@ -711,7 +885,7 @@ var now=0;
         for(var i=0;i<30;i++){
           var c=new Chr();
           if(i==0)own=c;
-          if(i%2==1){
+          if(i>=28){
             c.type=1;
             //c.child.type=1;
           }
@@ -738,6 +912,7 @@ var now=0;
       //  scene.add( new THREE.AmbientLight( 0x666666 ) );
       //
       scene.add(container);
+      scene.add(container2d);
         var axis = new THREE.AxisHelper(1000);
         scene.add(axis);
 
@@ -777,6 +952,11 @@ var now=0;
           requestAnimationFrame(tick);
 
           container.traverse( function( node ) {
+              if(node.update){
+                node.update();
+              }
+          });
+          container2d.traverse( function( node ) {
               if(node.update){
                 node.update();
               }
